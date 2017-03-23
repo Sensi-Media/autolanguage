@@ -68,13 +68,15 @@ class Route
         'session' => null,
     ];
 
+    private static $config = [];
+
     /**
      * Constructor. Optionally pass a hash of options. If an option is missing,
      * the corresponding value from the defaults is used.
      */
     public function __construct(array $config = [])
     {
-        $this->config = $config + $this->defaults;
+        self::$config = $config + $this->defaults;
     }
 
     /**
@@ -86,53 +88,58 @@ class Route
      */
     public function __invoke()
     {
-        if ($this->options['user']) {
-            $language = $this->config['user'];
-        } elseif ($this->config['cookie']
-            && isset($_COOKIE[$this->config['cookie']])
-            && in_array($_COOKIE[$this->config['cookie']], $this->config['allowed'])
+        if (self::$config['user']) {
+            $language = self::$config['user'];
+        } elseif (self::$config['cookie']
+            && isset($_COOKIE[self::$config['cookie']])
+            && in_array($_COOKIE[self::$config['cookie']], self::$config['allowed'])
         ) {
-            $language = $_COOKIE[$this->config['cookie']];
-        } elseif ($this->config['session'] && isset($_SESSION[$this->config['session']])) {
-            $language = $_SESSION[$this->config['session']];
+            $language = $_COOKIE[self::$config['cookie']];
+        } elseif (self::$config['session'] && isset($_SESSION[self::$config['session']])) {
+            $language = $_SESSION[self::$config['session']];
         } else {
-            $options = [];
-            if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-                $parts = preg_split('@,\s*@', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-                foreach ($parts as $part) {
-                    $parts = explode(';', $part);
-                    $code = strtolower(array_shift($parts));
-                    $code = preg_replace('/-[a-z]{2,}$/', '', $code);
-                    if (preg_match('@;q=(.*?)$@', $part, $match)) {
-                        $weight = $match[1];
-                    } else {
-                        $weight = 1;
-                    }
-                    $options[$code] = $options[$code] ?? 0;
-                    $options[$code] += $weight;
-                }
-                asort($options);
-            }
-            foreach (array_reverse($options) as $lan => $weight) {
-                if (in_array($lan, $this->config['allowed'])) {
-                    $language = $lan;
-                    break;
-                }
-            }
+            $language = self::getPreferredLanguage();
         }
         if (!isset($language)) {
-            if (isset($this->config['fallback'])) {
-                if (is_callable($this->config['fallback'])) {
-                    return $this->config['fallback'];
+            if (isset(self::$config['fallback'])) {
+                if (is_callable(self::$config['fallback'])) {
+                    return self::$config['fallback'];
                 } else {
-                    $language = $this->config['fallback'];
+                    $language = self::$config['fallback'];
                 }
             } else {
                 throw new DomainException("Sorry, couldn't find a valid language to redirect to.");
             }
         }
-        $url = str_replace(':language', $language, $this->config['template']);
+        $url = str_replace(':language', $language, self::$config['template']);
         return new RedirectResponse($url);
+    }
+
+    public static function getPreferredLanguage()
+    {
+        $options = [];
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $parts = preg_split('@,\s*@', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            foreach ($parts as $part) {
+                $parts = explode(';', $part);
+                $code = strtolower(array_shift($parts));
+                $code = preg_replace('/-[a-z]{2,}$/', '', $code);
+                if (preg_match('@;q=(.*?)$@', $part, $match)) {
+                    $weight = $match[1];
+                } else {
+                    $weight = 1;
+                }
+                $options[$code] = $options[$code] ?? 0;
+                $options[$code] += $weight;
+            }
+            asort($options);
+        }
+        foreach (array_reverse($options) as $lan => $weight) {
+            if (in_array($lan, self::$config['allowed'])) {
+                return $lan;
+            }
+        }
+        return null;
     }
 }
 
