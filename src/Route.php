@@ -68,6 +68,7 @@ class Route
         'session' => null,
     ];
 
+    /** @var array */
     private static $config = [];
 
     /**
@@ -86,7 +87,7 @@ class Route
      * @return Zend\Diactoros\Response\RedirectResponse
      * @throws DomainException if not valid language could be determined.
      */
-    public function __invoke()
+    public function __invoke() : RedirectResponse
     {
         if (self::$config['user']) {
             $language = self::$config['user'];
@@ -115,7 +116,12 @@ class Route
         return new RedirectResponse($url);
     }
 
-    public static function getPreferredLanguage()
+    /**
+     * Guesstimate preferred language based on browser info.
+     *
+     * @return string|null Language string, or null if nothing could be found.
+     */
+    public static function getPreferredLanguage() :? string
     {
         $options = [];
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
