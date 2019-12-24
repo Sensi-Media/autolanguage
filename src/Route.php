@@ -23,47 +23,55 @@ use Zend\Diactoros\Response\RedirectResponse;
 class Route
 {
     /**
-     * @var array Hash of default options.
+     * Hash of default options.
+     *
+     * @var array
      */
     private $defaults = [
         /**
-         * @var string
          * If set, the language for the currently logged in user.
+         *
+         * @var string
          */
         'user' => null,
 
         /**
-         * @var array
          * An array of allowed languages.
+         *
+         * @var array
          */
         'allowed' => ['en'],
 
         /**
-         * @var string|callable
          * If set, the fallback language if no allowed language could be set.
          * Defaults to English, set to null to use the first option in $allowed
          * instead. Use a callable to forward processing to a custom function
          * (e.g. a "please pick a language" page).
+         *
+         * @var string|callable
          */
         'fallback' => 'en',
 
         /**
-         * @var string
          * The URL template to inject the found language into. Uses :language as
          * a placeholder (simple str_replace).
+         *
+         * @var string
          */
         'template' => '/:language/',
 
         /**
-         * @var string
          * Optional name of cookie containing previously selected language.
+         *
+         * @var string
          */
         'cookie' => null,
 
         /**
-         * @var string
          * Optional name of session variable containing previously selected
          * language.
+         *
+         * @var string
          */
         'session' => null,
     ];
@@ -74,6 +82,9 @@ class Route
     /**
      * Constructor. Optionally pass a hash of options. If an option is missing,
      * the corresponding value from the defaults is used.
+     *
+     * @param array $config Optional configuration, see defaults.
+     * @return void
      */
     public function __construct(array $config = [])
     {
