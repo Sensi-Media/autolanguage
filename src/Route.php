@@ -3,7 +3,7 @@
 namespace Sensi\Autolanguage;
 
 use DomainException;
-use Zend\Diactoros\Response\RedirectResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
 
 /**
  * Autolanguage router.
@@ -95,7 +95,7 @@ class Route
      * Invoker. This is designed to work with Monolyth\Reroute, but could also
      * be called manually for other routing systems.
      *
-     * @return Zend\Diactoros\Response\RedirectResponse
+     * @return Laminas\Diactoros\Response\RedirectResponse
      * @throws DomainException if not valid language could be determined.
      */
     public function __invoke() : RedirectResponse
