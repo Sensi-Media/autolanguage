@@ -3,7 +3,7 @@
 namespace Sensi\Autolanguage;
 
 use DomainException;
-use Zend\Diactoros\Response\RedirectResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
 
 /**
  * Autolanguage router.
