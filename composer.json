@@ -1,8 +1,8 @@
 {
-    "name": "sensi/autolanguage",
-    "description": "Autolanguage route component",
+    "name": "sensimedia/autolanguage",
+    "description": "Automatically guesstimate the visitor's language",
     "type": "library",
-    "license": "none",
+    "license": "proprietary",
     "authors": [
         {
             "name": "Marijn Ophort",
